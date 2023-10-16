@@ -47,27 +47,16 @@ class MainActivity : AppCompatActivity(),ImageReader.OnImageAvailableListener, O
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        //TODO show live camera footage
-        //TODO ask for permission of camera upon first launch of application
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            if (checkSelfPermission(Manifest.permission.CAMERA) == PackageManager.PERMISSION_DENIED
-            ) {
-                val permission = arrayOf(
-                    Manifest.permission.CAMERA
-                )
-                requestPermissions(permission, 1122)
-            } else {
-                //TODO show live camera footage
-                setFragment()
-            }
-        }else{
-            //TODO show live camera footage
+        if (checkSelfPermission(Manifest.permission.CAMERA) == PackageManager.PERMISSION_DENIED
+        ) {
+            val permission = arrayOf(
+                Manifest.permission.CAMERA
+            )
+            requestPermissions(permission, 1122)
+        } else {
             setFragment()
         }
 
-
-
-        //TODO intialize object detector
         objectDetectorHelper =
             ObjectDetectorHelper(
                 context = applicationContext,
@@ -86,16 +75,12 @@ class MainActivity : AppCompatActivity(),ImageReader.OnImageAvailableListener, O
         grantResults: IntArray
     ) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-        //TODO show live camera footage
         if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-            //TODO show live camera footage
             setFragment()
         } else {
             finish()
         }
     }
-
-    //TODO fragment which show llive footage from camera
     var previewHeight = 0
     var previewWidth = 0
     private var sensorOrientation = 0
@@ -158,8 +143,6 @@ class MainActivity : AppCompatActivity(),ImageReader.OnImageAvailableListener, O
         supportFragmentManager.beginTransaction().replace(R.id.container, fragment).commit()
     }
 
-
-    //TODO getting frames of live camera footage and passing them to model
     private var isProcessingFrame = false
     private val yuvBytes = arrayOfNulls<ByteArray>(3)
     private var rgbBytes: IntArray? = null
@@ -168,7 +151,6 @@ class MainActivity : AppCompatActivity(),ImageReader.OnImageAvailableListener, O
     private var imageConverter: Runnable? = null
     private var rgbFrameBitmap: Bitmap? = null
 
-    @RequiresApi(Build.VERSION_CODES.N)
     override fun onImageAvailable(reader: ImageReader) {
         // We need wait until we have some size from onPreviewSizeChosen
         if (previewWidth == 0 || previewHeight == 0) {
@@ -216,7 +198,6 @@ class MainActivity : AppCompatActivity(),ImageReader.OnImageAvailableListener, O
 
     var croppedBitmap: Bitmap? = null
     private var tracker: MultiBoxTracker? = null
-    @RequiresApi(Build.VERSION_CODES.N)
     fun processImage() {
         imageConverter!!.run()
         rgbFrameBitmap =
@@ -226,7 +207,6 @@ class MainActivity : AppCompatActivity(),ImageReader.OnImageAvailableListener, O
         val canvas = Canvas(croppedBitmap!!)
         canvas.drawBitmap(rgbFrameBitmap!!, frameToCropTransform!!, null)
 
-        //TODO pass image to model and get results
         var resultBundle = objectDetectorHelper.detectImage(rgbFrameBitmap!!);
         if(resultBundle != null){
             var results = ArrayList<Recognition>();
@@ -274,7 +254,7 @@ class MainActivity : AppCompatActivity(),ImageReader.OnImageAvailableListener, O
             if (yuvBytes[i] == null) {
                 yuvBytes[i] = ByteArray(buffer.capacity())
             }
-            buffer[yuvBytes[i]]
+            buffer[yuvBytes[i]!!]
         }
     }
 
